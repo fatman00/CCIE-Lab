@@ -1,0 +1,169 @@
+lab:
+  description: "CCIE workbook lab: BGP eBGP peer relationships"
+  notes: ""
+  title: "BGP - eBGP Peer Relations"
+  version: 0.3.0
+nodes:
+  - id: n0
+    label: R1
+    node_definition: iosv
+    x: -550
+    y: -50
+    configuration: |-
+      hostname R1
+      no ip domain lookup
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      !
+      interface Loopback0
+       description BGP_ROUTER_ID_AND_MULTIHOP_SOURCE
+       ip address 10.255.1.1 255.255.255.255
+       ipv6 address 2001:DB8:255:1::1/128
+      !
+      interface GigabitEthernet0/0
+       description R1_TO_R2
+       ip address 10.12.0.1 255.255.255.252
+       ipv6 address 2001:DB8:12::1/64
+       no shutdown
+      !
+      interface GigabitEthernet0/1
+       description R1_TO_R3
+       ip address 10.13.0.1 255.255.255.252
+       ipv6 address 2001:DB8:13::1/64
+       no shutdown
+      !
+      ip route 10.255.3.3 255.255.255.255 10.13.0.2
+      ipv6 route 2001:DB8:255:3::3/128 2001:DB8:13::2
+      !
+      line con 0
+       logging synchronous
+       exec-timeout 0 0
+      line vty 0 4
+       login
+       transport input telnet ssh
+      !
+      end
+    interfaces:
+      - id: i0
+        label: GigabitEthernet0/0
+        slot: 0
+        type: physical
+      - id: i1
+        label: GigabitEthernet0/1
+        slot: 1
+        type: physical
+  - id: n1
+    label: R2
+    node_definition: iosv
+    x: 0
+    y: -350
+    configuration: |-
+      hostname R2
+      no ip domain lookup
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      !
+      interface Loopback0
+       description BGP_ROUTER_ID
+       ip address 10.255.2.2 255.255.255.255
+       ipv6 address 2001:DB8:255:2::2/128
+      !
+      interface GigabitEthernet0/0
+       description R2_TO_R1
+       ip address 10.12.0.2 255.255.255.252
+       ipv6 address 2001:DB8:12::2/64
+       no shutdown
+      !
+      interface GigabitEthernet0/1
+       description R2_TO_R3
+       ip address 10.23.0.1 255.255.255.252
+       ipv6 address 2001:DB8:23::1/64
+       no shutdown
+      !
+      line con 0
+       logging synchronous
+       exec-timeout 0 0
+      line vty 0 4
+       login
+       transport input telnet ssh
+      !
+      end
+    interfaces:
+      - id: i0
+        label: GigabitEthernet0/0
+        slot: 0
+        type: physical
+      - id: i1
+        label: GigabitEthernet0/1
+        slot: 1
+        type: physical
+  - id: n2
+    label: R3
+    node_definition: iosv
+    x: 550
+    y: -50
+    configuration: |-
+      hostname R3
+      no ip domain lookup
+      service timestamps debug datetime msec
+      service timestamps log datetime msec
+      !
+      interface Loopback0
+       description BGP_ROUTER_ID_AND_MULTIHOP_SOURCE
+       ip address 10.255.3.3 255.255.255.255
+       ipv6 address 2001:DB8:255:3::3/128
+      !
+      interface GigabitEthernet0/0
+       description R3_TO_R2
+       ip address 10.23.0.2 255.255.255.252
+       ipv6 address 2001:DB8:23::2/64
+       no shutdown
+      !
+      interface GigabitEthernet0/1
+       description R3_TO_R1
+       ip address 10.13.0.2 255.255.255.252
+       ipv6 address 2001:DB8:13::2/64
+       no shutdown
+      !
+      ip route 10.255.1.1 255.255.255.255 10.13.0.1
+      ipv6 route 2001:DB8:255:1::1/128 2001:DB8:13::1
+      !
+      line con 0
+       logging synchronous
+       exec-timeout 0 0
+      line vty 0 4
+       login
+       transport input telnet ssh
+      !
+      end
+    interfaces:
+      - id: i0
+        label: GigabitEthernet0/0
+        slot: 0
+        type: physical
+      - id: i1
+        label: GigabitEthernet0/1
+        slot: 1
+        type: physical
+links:
+  - id: l0
+    n1: n0
+    i1: i0
+    n2: n1
+    i2: i0
+    conditioning: {}
+    label: R1-Gi0/0--R2-Gi0/0
+  - id: l1
+    n1: n1
+    i1: i1
+    n2: n2
+    i2: i0
+    conditioning: {}
+    label: R2-Gi0/1--R3-Gi0/0
+  - id: l2
+    n1: n0
+    i1: i1
+    n2: n2
+    i2: i1
+    conditioning: {}
+    label: R1-Gi0/1--R3-Gi0/1
